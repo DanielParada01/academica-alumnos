@@ -46,6 +46,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="academica.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>academica.xsd</DependentUpon>
+    </Compile>
     <Compile Include="Conexion.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -86,6 +91,17 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="academica.xsc">
+      <DependentUpon>academica.xsd</DependentUpon>
+    </None>
+    <None Include="academica.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>academica.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="academica.xss">
+      <DependentUpon>academica.xsd</DependentUpon>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

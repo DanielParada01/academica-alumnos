@@ -1,164 +1,105 @@
-﻿
-namespace academica-alumnos
+﻿using System;
+using System.Data;
+using System.Data.SqlClient;
+
+namespace academicaAlumnos
 {
-    partial class frmPrincipal
+    public class Conexion
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        
+        private string cadenaConexion = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=SistemaUsuarios;Integrated Security=True;Encrypt=True";
+        
+        private SqlConnection conexion;
+        private SqlDataAdapter adaptador;
+        private DataSet ds = new DataSet();
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
+        
+        public DataSet obtenerDatos()
         {
-            if (disposing && (components != null))
+            ds.Clear();
+            conexion = new SqlConnection(cadenaConexion);
+            string query = @"SELECT 
+                                idAlumno    AS id,
+                                codigo      AS codigo,
+                                nombre      AS nombre,
+                                direccion   AS direccion,
+                                telefono    AS telefono 
+                             FROM alumnos 
+                             ORDER BY nombre";
+
+            adaptador = new SqlDataAdapter(query, conexion);
+            adaptador.Fill(ds, "alumnos");
+            return ds;
+        }
+
+       
+        public string administrarDatosAlumnos(string[] valores, string accion)
+        {
+            string salida = "1";
+
+            try
             {
-                components.Dispose();
+                conexion = new SqlConnection(cadenaConexion);
+                conexion.Open();
+
+                SqlCommand comando = new SqlCommand();
+                comando.Connection = conexion;
+
+                switch (accion)
+                {
+                    case "nuevo":
+                        comando.CommandText = "INSERT INTO alumnos (codigo, nombre, direccion, telefono) VALUES (@codigo, @nombre, @direccion, @telefono)";
+                        comando.Parameters.AddWithValue("@codigo", valores[1]);
+                        comando.Parameters.AddWithValue("@nombre", valores[2]);
+                        comando.Parameters.AddWithValue("@direccion", valores[3]);
+                        comando.Parameters.AddWithValue("@telefono", valores[4]);
+                        break;
+
+                    case "modificar":
+                        comando.CommandText = "UPDATE alumnos SET codigo=@codigo, nombre=@nombre, direccion=@direccion, telefono=@telefono WHERE idAlumno=@id";
+                        comando.Parameters.AddWithValue("@id", valores[0]);
+                        comando.Parameters.AddWithValue("@codigo", valores[1]);
+                        comando.Parameters.AddWithValue("@nombre", valores[2]);
+                        comando.Parameters.AddWithValue("@direccion", valores[3]);
+                        comando.Parameters.AddWithValue("@telefono", valores[4]);
+                        break;
+
+                    case "eliminar":
+                        comando.CommandText = "DELETE FROM alumnos WHERE idAlumno=@id";
+                        comando.Parameters.AddWithValue("@id", valores[0]);
+                        break;
+                }
+
+                comando.ExecuteNonQuery();
             }
-            base.Dispose(disposing);
+            catch (Exception ex)
+            {
+                salida = "Error: " + ex.Message;
+            }
+            finally
+            {
+                if (conexion != null && conexion.State == ConnectionState.Open)
+                    conexion.Close();
+            }
+
+            return salida;
         }
 
-        #region Windows Form Designer generated code
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
+        
+        public bool probarConexion()
         {
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.archivoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.salirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.aplicacionesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.alumnosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.docentesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.materiasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.periodosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
-            this.notasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuStrip1.SuspendLayout();
-            this.SuspendLayout();
-            // 
-            // menuStrip1
-            // 
-            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.archivoToolStripMenuItem,
-            this.aplicacionesToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1067, 28);
-            this.menuStrip1.TabIndex = 0;
-            this.menuStrip1.Text = "menuStrip1";
-            // 
-            // archivoToolStripMenuItem
-            // 
-            this.archivoToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.salirToolStripMenuItem});
-            this.archivoToolStripMenuItem.Name = "archivoToolStripMenuItem";
-            this.archivoToolStripMenuItem.Size = new System.Drawing.Size(73, 24);
-            this.archivoToolStripMenuItem.Text = "Archivo";
-            // 
-            // salirToolStripMenuItem
-            // 
-            this.salirToolStripMenuItem.Name = "salirToolStripMenuItem";
-            this.salirToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F4)));
-            this.salirToolStripMenuItem.Size = new System.Drawing.Size(178, 26);
-            this.salirToolStripMenuItem.Text = "Salir";
-            this.salirToolStripMenuItem.Click += new System.EventHandler(this.salirToolStripMenuItem_Click);
-            // 
-            // aplicacionesToolStripMenuItem
-            // 
-            this.aplicacionesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.alumnosToolStripMenuItem,
-            this.docentesToolStripMenuItem,
-            this.materiasToolStripMenuItem,
-            this.periodosToolStripMenuItem,
-            this.toolStripMenuItem1,
-            this.notasToolStripMenuItem});
-            this.aplicacionesToolStripMenuItem.Name = "aplicacionesToolStripMenuItem";
-            this.aplicacionesToolStripMenuItem.Size = new System.Drawing.Size(107, 24);
-            this.aplicacionesToolStripMenuItem.Text = "Aplicaciones";
-            // 
-            // alumnosToolStripMenuItem
-            // 
-            this.alumnosToolStripMenuItem.Image = global::academica-alumnos.Properties.Resources.alumno;
-            this.alumnosToolStripMenuItem.Name = "alumnosToolStripMenuItem";
-            this.alumnosToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.alumnosToolStripMenuItem.Size = new System.Drawing.Size(204, 26);
-            this.alumnosToolStripMenuItem.Text = "Alumnos";
-            this.alumnosToolStripMenuItem.Click += new System.EventHandler(this.alumnosToolStripMenuItem_Click);
-            // 
-            // docentesToolStripMenuItem
-            // 
-            this.docentesToolStripMenuItem.Image = global::academica-alumnos.Properties.Resources.docentes;
-            this.docentesToolStripMenuItem.Name = "docentesToolStripMenuItem";
-            this.docentesToolStripMenuItem.Size = new System.Drawing.Size(204, 26);
-            this.docentesToolStripMenuItem.Text = "Docentes";
-            // 
-            // materiasToolStripMenuItem
-            // 
-            this.materiasToolStripMenuItem.Image = global::academica-alumnos.Properties.Resources.materia;
-            this.materiasToolStripMenuItem.Name = "materiasToolStripMenuItem";
-            this.materiasToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M)));
-            this.materiasToolStripMenuItem.Size = new System.Drawing.Size(204, 26);
-            this.materiasToolStripMenuItem.Text = "Materias";
-            this.materiasToolStripMenuItem.Click += new System.EventHandler(this.materiasToolStripMenuItem_Click);
-            // 
-            // periodosToolStripMenuItem
-            // 
-            this.periodosToolStripMenuItem.Name = "periodosToolStripMenuItem";
-            this.periodosToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
-            this.periodosToolStripMenuItem.Size = new System.Drawing.Size(204, 26);
-            this.periodosToolStripMenuItem.Text = "Periodos";
-            this.periodosToolStripMenuItem.Click += new System.EventHandler(this.periodosToolStripMenuItem_Click);
-            // 
-            // toolStripMenuItem1
-            // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(201, 6);
-            // 
-            // notasToolStripMenuItem
-            // 
-            this.notasToolStripMenuItem.Name = "notasToolStripMenuItem";
-            this.notasToolStripMenuItem.Size = new System.Drawing.Size(204, 26);
-            this.notasToolStripMenuItem.Text = "Notas";
-            this.notasToolStripMenuItem.Click += new System.EventHandler(this.notasToolStripMenuItem_Click);
-            // 
-            // frmPrincipal
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1067, 554);
-            this.Controls.Add(this.menuStrip1);
-            this.IsMdiContainer = true;
-            this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.Name = "frmPrincipal";
-            this.Text = "SISTEMA ACADEMICO";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.Load += new System.EventHandler(this.frmPrincipal_Load);
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(cadenaConexion))
+                {
+                    conn.Open();
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
         }
-
-        #endregion
-
-        private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem archivoToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem salirToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem aplicacionesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem alumnosToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem docentesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem materiasToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem periodosToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem notasToolStripMenuItem;
     }
 }
